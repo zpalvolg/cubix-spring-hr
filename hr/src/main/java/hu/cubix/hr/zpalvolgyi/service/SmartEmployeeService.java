@@ -45,6 +45,6 @@ public class SmartEmployeeService implements EmployeeService{
 
         Period period = Period.between(hiringDate.toLocalDate(), now.toLocalDate());
 
-        return Double.parseDouble(period.getYears()+"."+period.getMonths());
+        return Double.parseDouble(period.getYears()+"."+String.format("%02d", period.getMonths()));
     }
 }

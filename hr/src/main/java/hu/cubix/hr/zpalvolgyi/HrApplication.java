@@ -24,7 +24,7 @@ public class HrApplication implements CommandLineRunner {
 		printProcess(new Employee(1L, "Accountant", 700, LocalDateTime.of(2020, 4, 10, 0, 0, 0)));
 		printProcess(new Employee(2L, "IT Specialist", 950, LocalDateTime.of(2017, 5, 11, 0, 0, 0)));
 		printProcess(new Employee(3L, "Network Architect", 1200, LocalDateTime.of(2007, 6, 12, 0, 0, 0)));
-		printProcess(new Employee(4L, "Sales Intern", 400, LocalDateTime.of(2023, 7, 13, 0, 0, 0)));
+		printProcess(new Employee(4L, "Sales Intern", 400, LocalDateTime.of(2023, 5, 3, 0, 0, 0)));
 	}
 
 	private void printProcess(Employee employee){
