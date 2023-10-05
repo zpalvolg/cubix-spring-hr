@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="ISO-8859-1">
+  <title>Employees</title>
+  <style>
+    table {
+        border-collapse: collapse;
+        width: 50%;
+    }
+
+    th, td {
+        border: 1px solid #000;
+        text-align: center;
+        padding: 8px;
+    }
+
+    th {
+        background-color: #FFD700;
+        color: #0000FF;
+    }
+
+    tr {
+        background-color: #FFFFE0;
+        color: #000;
+    }
+  </style>
+</head>
+<body>
+
+<form th:object="${newEmployee}" method="post" th:action="@{/employee}">
+  <table>
+    <thead>
+    <tr>
+      <th>Id</th>
+      <th>Job</th>
+      <th>Salary</th>
+      <th>Hiring Date</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="employee : ${employees}">
+      <td>
+        <span th:text="${employee.id}"></span>
+      </td>
+      <td>
+        <span th:text="${employee.job}"></span>
+      </td>
+      <td>
+        <span th:text="${employee.salary}"></span>
+      </td>
+      <td>
+        <span th:text="${employee.hiringDate}"></span>
+      </td>
+    </tr>
+    <tr id="addNewRecord" style="display: none;">
+      <td>
+        <input th:field="*{id}" />
+      </td>
+      <td>
+        <input th:field="*{job}" />
+      </td>
+      <td>
+        <input th:field="*{salary}" />
+      </td>
+      <td>
+        <input th:field="*{hiringDate}" />
+      </td>
+    </tr>
+    </tbody>
+  </table>
+  <button type="button" id="addRowButton" onclick="addRow()">Add Row</button>
+  <input type="submit" id="submitButton" value="Create" style="display: none;" />
+</form>
+
+<script th:inline="javascript">
+  function addRow() {
+      document.getElementById('addRowButton').style.display = 'none';
+      document.getElementById('addNewRecord').style.display = 'table-row';
+      document.getElementById('submitButton').style.display = 'block';
+  }
+</script>
+
+</body>
+</html>
