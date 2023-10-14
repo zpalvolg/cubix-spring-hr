@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 public class Employee {
     private Long id;
+    private String name;
     private String job;
     private int salary;
     private LocalDateTime hiringDate;
@@ -11,8 +12,9 @@ public class Employee {
     public Employee() {
     }
 
-    public Employee(Long id, String job, int salary, LocalDateTime hiringDate) {
+    public Employee(Long id, String name, String job, int salary, LocalDateTime hiringDate) {
         this.id = id;
+        this.name = name;
         this.job = job;
         this.salary = salary;
         this.hiringDate = hiringDate;
@@ -24,6 +26,14 @@ public class Employee {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getJob() {
@@ -48,15 +58,5 @@ public class Employee {
 
     public void setHiringDate(LocalDateTime hiringDate) {
         this.hiringDate = hiringDate;
-    }
-
-    @Override
-    public String toString() {
-        return "Employee{" +
-                "id=" + id +
-                ", job='" + job + '\'' +
-                ", salary=" + salary +
-                ", hiringDate=" + hiringDate +
-                '}';
     }
 }

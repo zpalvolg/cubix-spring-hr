@@ -6,7 +6,7 @@ import hu.cubix.hr.zpalvolgyi.model.Employee;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;
-import java.time.Period;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 public class SmartEmployeeService implements EmployeeService{
@@ -21,10 +21,11 @@ public class SmartEmployeeService implements EmployeeService{
         //initialize values
         int resultPercentage = 0;
 
-        double yearsSpentAtCompany = getWorkingPeriod(employee.getHiringDate());
+        double yearsSpentAtCompany = ChronoUnit.DAYS.between(employee.getHiringDate(), LocalDateTime.now()) / 365.0;
+
         System.out.println("Years spent at the company: " + yearsSpentAtCompany);
 
-        //get confing rated values
+        //get confing related values
         Smart smartConfig = config.getService().getSmart();
         List<Double> getYearLimits = smartConfig.getYearLimits();
         List<Integer> raisePercentages = smartConfig.getRaisePercentages();
@@ -38,13 +39,5 @@ public class SmartEmployeeService implements EmployeeService{
         }
 
         return resultPercentage;
-    }
-
-    private double getWorkingPeriod(LocalDateTime hiringDate){
-        LocalDateTime now = LocalDateTime.now();
-
-        Period period = Period.between(hiringDate.toLocalDate(), now.toLocalDate());
-
-        return Double.parseDouble(period.getYears()+"."+String.format("%02d", period.getMonths()));
     }
 }

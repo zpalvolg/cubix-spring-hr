@@ -21,17 +21,19 @@ public class HrApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		printProcess(new Employee(1L, "Accountant", 700, LocalDateTime.of(2020, 4, 10, 0, 0, 0)));
-		printProcess(new Employee(2L, "IT Specialist", 950, LocalDateTime.of(2017, 5, 11, 0, 0, 0)));
-		printProcess(new Employee(3L, "Network Architect", 1200, LocalDateTime.of(2007, 6, 12, 0, 0, 0)));
-		printProcess(new Employee(4L, "Sales Intern", 400, LocalDateTime.of(2023, 5, 3, 0, 0, 0)));
+		printProcess(new Employee(1L, "John","Accountant", 700, LocalDateTime.of(2020, 4, 10, 0, 0, 0)));
+		printProcess(new Employee(2L, "Mary","IT Specialist", 950, LocalDateTime.of(2017, 5, 11, 0, 0, 0)));
+		printProcess(new Employee(3L, "William","Network Architect", 1200, LocalDateTime.of(2007, 6, 12, 0, 0, 0)));
+		printProcess(new Employee(4L, "Jennifer","Sales Intern", 400, LocalDateTime.of(2022, 9, 3, 0, 0, 0)));
+		printProcess(new Employee(5L, "Michael","Global Manager", 1500, LocalDateTime.of(2016, 5, 3, 0, 0, 0)));
 	}
 
 	private void printProcess(Employee employee){
 		System.out.println(employee.getId() + ". ----------------------------------------------------------------------------------------");
-		System.out.println(employee.getJob() + " salary before raise: " + employee.getSalary());
+		System.out.println(employee.getName() + " - " + employee.getJob());
+		System.out.println("Salary before raise: " + employee.getSalary());
 		salaryService.setNewSalary(employee);
-		System.out.println(employee.getJob() + " salary after raise: " + employee.getSalary());
+		System.out.println("Salary after raise: " + employee.getSalary());
 		System.out.println("----------------------------------------------------------------------------------------");
 	}
 }
