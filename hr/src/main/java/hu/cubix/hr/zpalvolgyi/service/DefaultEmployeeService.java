@@ -3,7 +3,7 @@ package hu.cubix.hr.zpalvolgyi.service;
 import hu.cubix.hr.zpalvolgyi.model.Employee;
 import org.springframework.stereotype.Service;
 
-public class DefaultEmployeeService implements EmployeeService{
+public class DefaultEmployeeService extends AbstractEmployeeService{
     @Override
     public int getPayRaisePercent(Employee employee) {
         System.out.println("DefaultEmployeeService is active");
