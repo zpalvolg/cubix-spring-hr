@@ -1,5 +1,6 @@
 package hu.cubix.hr.zpalvolgyi.dto;
 
+import hu.cubix.hr.zpalvolgyi.model.Company;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.PositiveOrZero;
@@ -67,16 +68,5 @@ public class EmployeeDto {
 
     public void setHiringDate(LocalDateTime hiringDate) {
         this.hiringDate = hiringDate;
-    }
-
-    @Override
-    public String toString() {
-        return "EmployeeDto{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", job='" + job + '\'' +
-                ", salary=" + salary +
-                ", hiringDate=" + hiringDate +
-                '}';
     }
 }

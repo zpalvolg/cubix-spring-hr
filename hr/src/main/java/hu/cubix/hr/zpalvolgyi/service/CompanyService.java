@@ -1,37 +1,28 @@
 package hu.cubix.hr.zpalvolgyi.service;
 
-import hu.cubix.hr.zpalvolgyi.dto.CompanyDto;
-import hu.cubix.hr.zpalvolgyi.dto.EmployeeDto;
-import hu.cubix.hr.zpalvolgyi.model.Company;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
-import java.time.LocalDateTime;
+import hu.cubix.hr.zpalvolgyi.model.Company;
+import hu.cubix.hr.zpalvolgyi.model.Employee;
+import hu.cubix.hr.zpalvolgyi.repository.CompanyRepository;
+import hu.cubix.hr.zpalvolgyi.repository.EmployeeRepository;
+import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class CompanyService {
 
-    private List<Company> companies = new ArrayList<>();
-    private List<EmployeeDto> employees1 = new ArrayList<>();
-    private List<EmployeeDto> employees2 = new ArrayList<>();
+    @Autowired
+    private CompanyRepository companyRepository;
 
-    {
-        employees1.add(new EmployeeDto(1L, "John","Accountant", 700, LocalDateTime.of(2020, 4, 10, 0, 0, 0)));
-        employees1.add(new EmployeeDto(2L, "Mary","IT Specialist", 950, LocalDateTime.of(2017, 5, 11, 0, 0, 0)));
-
-        employees2.add(new EmployeeDto(3L, "William","Network Architect", 1200, LocalDateTime.of(2007, 6, 12, 0, 0, 0)));
-        employees2.add(new EmployeeDto(4L, "Jennifer","Sales Intern", 400, LocalDateTime.of(2022, 9, 3, 0, 0, 0)));
-        employees2.add(new EmployeeDto(5L, "Michael","Global Manager", 1500, LocalDateTime.of(2016, 5, 3, 0, 0, 0)));
-
-        companies.add(new Company(1L, 123L, "Test-1 Ldt.", "Debrecen, Piac Street 123", employees1));
-        companies.add(new Company(2L, 456L, "Test-2 Ldt.", "Debrecen, Petofi Street 456", employees2));
-    }
+    @Autowired
+    private EmployeeRepository employeeRepository;
 
     public List<Company> findAll(Boolean full){
         List<Company> companiesWithoutEmployees = new ArrayList<>();
+        List<Company> companies = companyRepository.findAll();
 
         for(Company company: companies){
             Company companyWithoutEmployee = new Company(company.getId(),company.getRegistrationNumber(),company.getName(),company.getAddress(),null);
@@ -48,7 +39,7 @@ public class CompanyService {
     }
 
     public Company findById(long id, Boolean full) {
-        Company company = companies.stream().filter(c -> c.getId().equals(id)).findAny().orElse(null);
+        Company company = companyRepository.findById(id).orElse(null);
 
         if(company == null) {
             return null;
@@ -65,65 +56,57 @@ public class CompanyService {
         }
     }
 
+    @Transactional
     public Company create(Company newCompany){
-        Company companyAlreadyExists = companies.stream().filter(c -> c.getId().equals(newCompany.getId())).findAny().orElse(null);
-
-        if(companyAlreadyExists == null) {
-            companies.add(newCompany);
-            return newCompany;
-        }else{
-            return null;
-        }
+        return companyRepository.save(newCompany);
     }
 
+    @Transactional
     public Company update(Company updatedCompany){
-        Company searchForCompany = companies.stream().filter(c -> c.getId().equals(updatedCompany.getId())).findAny().orElse(null);
-
-        if(searchForCompany != null) {
-            int index = companies.indexOf(searchForCompany);
-            companies.set(index, updatedCompany);
-            return updatedCompany;
-        }else{
+        if(findById(updatedCompany.getId(),null) == null) {
             return null;
         }
+        return companyRepository.save(updatedCompany);
     }
 
+    @Transactional
     public void delete(long id){
-        Company company = companies.stream().filter(c -> c.getId().equals(id)).findAny().orElse(null);
-        companies.remove(company);
+        companyRepository.deleteById(id);
     }
 
-    public Company addNewEmployee(long companyId, EmployeeDto employeeDto){
-        Company company = companies.stream().filter(c -> c.getId().equals(companyId)).findAny().orElse(null);
+    @Transactional
+    public Company addNewEmployee(long companyId, Employee employee){
+        Company company = findById(companyId,true);
 
         if (company == null){
             return null;
         }
         else{
-            List<EmployeeDto> employeeDtos = company.getEmployees();
-            employeeDtos.add(employeeDto);
-            company.setEmployees(employeeDtos);
-            return company;
+            employeeRepository.save(employee);
+            company.getEmployees().add(employee);
+            return companyRepository.save(company);
         }
     }
 
-    public void deleteEmployee(long companyId, long EmployeeId){
-        Company company = companies.stream().filter(c -> c.getId().equals(companyId)).findAny().orElse(null);
-        List<EmployeeDto> employeeDtos = company.getEmployees();
-        EmployeeDto employeeDto = employeeDtos.stream().filter(emp -> emp.getId().equals(EmployeeId)).findAny().orElse(null);
-        employeeDtos.remove(employeeDto);
-        company.setEmployees(employeeDtos);
+    @Transactional
+    public void deleteEmployee(long companyId, long employeeId){
+        Company company = company = findById(companyId,true);
+        Employee employee = employeeRepository.findById(employeeId).orElse(null);
+        company.getEmployees().remove(employee);
+        companyRepository.save(company);
     }
 
-    public Company updateEmployeeList(long companyId, List<EmployeeDto> employeeDtos){
-        Company company = companies.stream().filter(c -> c.getId().equals(companyId)).findAny().orElse(null);
+    @Transactional
+    public Company updateEmployeeList(long companyId, List<Employee> employees){
+        Company company = company = findById(companyId,true);
 
         if (company == null){
             return null;
         }
         else{
-            company.setEmployees(employeeDtos);
-            return company;
+            company.setEmployees(employees);
+            return companyRepository.save(company);
         }
     }
+
 }

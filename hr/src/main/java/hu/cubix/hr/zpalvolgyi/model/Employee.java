@@ -1,8 +1,14 @@
 package hu.cubix.hr.zpalvolgyi.model;
 
+import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
 
+@Entity
 public class Employee {
+
+    @Id
+    @GeneratedValue
     private Long id;
     private String name;
     private String job;

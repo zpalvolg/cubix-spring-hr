@@ -1,6 +1,7 @@
 package hu.cubix.hr.zpalvolgyi.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import hu.cubix.hr.zpalvolgyi.model.Employee;
 
 import java.util.List;
 
@@ -10,11 +11,11 @@ public class CompanyDto {
     private String name;
     private String address;
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private List<EmployeeDto> employees;
+    private List<Employee> employees;
     public CompanyDto() {
     }
 
-    public CompanyDto(Long id, Long registrationNumber, String name, String address, List<EmployeeDto> employees) {
+    public CompanyDto(Long id, Long registrationNumber, String name, String address, List<Employee> employees) {
         this.id = id;
         this.registrationNumber = registrationNumber;
         this.name = name;
@@ -54,11 +55,11 @@ public class CompanyDto {
         this.address = address;
     }
 
-    public List<EmployeeDto> getEmployees() {
+    public List<Employee> getEmployees() {
         return employees;
     }
 
-    public void setEmployees(List<EmployeeDto> employees) {
+    public void setEmployees(List<Employee> employees) {
         this.employees = employees;
     }
 }

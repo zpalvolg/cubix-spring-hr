@@ -1,20 +1,27 @@
 package hu.cubix.hr.zpalvolgyi.model;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import hu.cubix.hr.zpalvolgyi.dto.EmployeeDto;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 
 import java.util.List;
 
+@Entity
 public class Company {
+    @Id
+    @GeneratedValue
     private Long id;
     private Long registrationNumber;
     private String name;
     private String address;
-    private List<EmployeeDto> employees;
+    @OneToMany
+    private List<Employee> employees;
 
     public Company() {
     }
-    public Company(Long id, Long registrationNumber, String name, String address, List<EmployeeDto> employees) {
+    public Company(Long id, Long registrationNumber, String name, String address, List<Employee> employees) {
         this.id = id;
         this.registrationNumber = registrationNumber;
         this.name = name;
@@ -54,11 +61,11 @@ public class Company {
         this.address = address;
     }
 
-    public List<EmployeeDto> getEmployees() {
+    public List<Employee> getEmployees() {
         return employees;
     }
 
-    public void setEmployees(List<EmployeeDto> employees) {
+    public void setEmployees(List<Employee> employees) {
         this.employees = employees;
     }
 }

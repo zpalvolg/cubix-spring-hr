@@ -1,9 +1,9 @@
 package hu.cubix.hr.zpalvolgyi.controller;
 
 import hu.cubix.hr.zpalvolgyi.dto.CompanyDto;
-import hu.cubix.hr.zpalvolgyi.dto.EmployeeDto;
 import hu.cubix.hr.zpalvolgyi.mapper.CompanyMapper;
 import hu.cubix.hr.zpalvolgyi.model.Company;
+import hu.cubix.hr.zpalvolgyi.model.Employee;
 import hu.cubix.hr.zpalvolgyi.service.CompanyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -70,9 +70,9 @@ public class CompanyController {
     }
 
     @PostMapping("/{companyId}/employees")
-    public CompanyDto addNewEmployee(@PathVariable long companyId, @RequestBody EmployeeDto employeeDto) {
+    public CompanyDto addNewEmployee(@PathVariable long companyId, @RequestBody Employee employee) {
 
-        Company company = companyService.addNewEmployee(companyId,employeeDto);
+        Company company = companyService.addNewEmployee(companyId,employee);
 
         if(company == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
@@ -81,15 +81,15 @@ public class CompanyController {
         }
     }
 
-    @DeleteMapping("/{companyId}/employees/{EmployeeId}")
-    public void deleteEmployee(@PathVariable long companyId, @PathVariable long EmployeeId) {
-        companyService.deleteEmployee(companyId,EmployeeId);
+    @DeleteMapping("/{companyId}/employees/{employeeId}")
+    public void deleteEmployee(@PathVariable long companyId, @PathVariable long employeeId) {
+        companyService.deleteEmployee(companyId,employeeId);
     }
 
 
     @PutMapping("/{companyId}/employees")
-    public CompanyDto updateEmployeeList(@PathVariable long companyId, @RequestBody List<EmployeeDto> employeeDtos) {
-        Company company = companyService.updateEmployeeList(companyId,employeeDtos);
+    public CompanyDto updateEmployeeList(@PathVariable long companyId, @RequestBody List<Employee> employees) {
+        Company company = companyService.updateEmployeeList(companyId,employees);
 
         if(company == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
