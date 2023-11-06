@@ -1,6 +1,7 @@
 package hu.cubix.hr.zpalvolgyi.controller;
 
 import hu.cubix.hr.zpalvolgyi.dto.CompanyDto;
+import hu.cubix.hr.zpalvolgyi.dto.EmployeeDto;
 import hu.cubix.hr.zpalvolgyi.mapper.CompanyMapper;
 import hu.cubix.hr.zpalvolgyi.model.Company;
 import hu.cubix.hr.zpalvolgyi.model.Employee;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/companies")
@@ -23,13 +25,13 @@ public class CompanyController {
     private CompanyMapper companyMapper;
 
     @GetMapping
-    public List<CompanyDto> findAll(@RequestParam(name = "full", required = false) Boolean full) {
+    public List<CompanyDto> findAll(@RequestParam Optional<Boolean> full) {
         List<Company> companies = companyService.findAll(full);
         return companyMapper.companiesToDtos(companies);
     }
 
     @GetMapping("/{id}")
-    public CompanyDto findById(@PathVariable long id, @RequestParam(name = "full", required = false) Boolean full) {
+    public CompanyDto findById(@PathVariable long id, @RequestParam Optional<Boolean> full) {
         Company company = companyService.findById(id,full);
 
         if(company == null) {
@@ -96,5 +98,17 @@ public class CompanyController {
         }else{
             return companyMapper.companyToDto(company);
         }
+    }
+
+    @GetMapping("/salaryGreaterThan/{salaryLimit}")
+    public List<CompanyDto> findBySalary(@PathVariable int salaryLimit) {
+        List<Company> companies = companyService.findByEmployeeSalary(salaryLimit);
+        return companyMapper.companiesToDtos(companies);
+    }
+
+    @GetMapping("/numberOfEmp/{headcount}")
+    public List<CompanyDto> findByNumberOfEmp(@PathVariable int headcount) {
+        List<Company> companies = companyService.findByNumberOfEmp(headcount);
+        return companyMapper.companiesToDtos(companies);
     }
 }

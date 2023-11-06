@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CompanyService {
@@ -20,93 +21,89 @@ public class CompanyService {
     @Autowired
     private EmployeeRepository employeeRepository;
 
-    public List<Company> findAll(Boolean full){
+    public List<Company> findAll(Optional<Boolean> full){
         List<Company> companiesWithoutEmployees = new ArrayList<>();
         List<Company> companies = companyRepository.findAll();
 
-        for(Company company: companies){
-            Company companyWithoutEmployee = new Company(company.getId(),company.getRegistrationNumber(),company.getName(),company.getAddress(),null);
-            companiesWithoutEmployees.add(companyWithoutEmployee);
-        }
-
-        if(full == null){
-            return companiesWithoutEmployees;
-        } else if (!full) {
-            return companiesWithoutEmployees;
-        }else {
+        if(full.orElse(false)) {
             return companies;
+        }else {
+            for(Company company: companies){
+                Company companyWithoutEmployee = new Company(company.getId(),company.getRegistrationNumber(),company.getName(),company.getAddress(),null, company.getForm());
+                companiesWithoutEmployees.add(companyWithoutEmployee);
+            }
+
+            return companiesWithoutEmployees;
         }
     }
 
-    public Company findById(long id, Boolean full) {
+    public Company findById(long id, Optional<Boolean> full) {
         Company company = companyRepository.findById(id).orElse(null);
 
         if(company == null) {
             return null;
         }
 
-        Company companyWithoutEmloyee = new Company(company.getId(),company.getRegistrationNumber(),company.getName(),company.getAddress(),null);
-
-        if(full == null){
-            return companyWithoutEmloyee;
-        } else if (!full) {
-            return companyWithoutEmloyee;
-        }else {
+        if(full.orElse(false)) {
             return company;
+        }else {
+            Company companyWithoutEmloyee = new Company(company.getId(),company.getRegistrationNumber(),company.getName(),company.getAddress(),null,company.getForm());
+
+            return companyWithoutEmloyee;
         }
     }
 
-    @Transactional
+
     public Company create(Company newCompany){
         return companyRepository.save(newCompany);
     }
 
-    @Transactional
+
     public Company update(Company updatedCompany){
-        if(findById(updatedCompany.getId(),null) == null) {
+        if(!companyRepository.existsById(updatedCompany.getId())) {
             return null;
         }
         return companyRepository.save(updatedCompany);
     }
 
-    @Transactional
     public void delete(long id){
         companyRepository.deleteById(id);
     }
 
-    @Transactional
+
     public Company addNewEmployee(long companyId, Employee employee){
-        Company company = findById(companyId,true);
-
-        if (company == null){
-            return null;
-        }
-        else{
-            employeeRepository.save(employee);
-            company.getEmployees().add(employee);
-            return companyRepository.save(company);
-        }
+        Company company = companyRepository.findById(companyId).get();
+        company.addEmployee(employee);
+        employeeRepository.save(employee);
+        return company;
     }
 
-    @Transactional
     public void deleteEmployee(long companyId, long employeeId){
-        Company company = company = findById(companyId,true);
-        Employee employee = employeeRepository.findById(employeeId).orElse(null);
+        Company company = companyRepository.findById(companyId).get();
+        Employee employee = employeeRepository.findById(employeeId).get();
+        employee.setCompany(null);
         company.getEmployees().remove(employee);
-        companyRepository.save(company);
+        employeeRepository.save(employee);
     }
 
-    @Transactional
+
     public Company updateEmployeeList(long companyId, List<Employee> employees){
-        Company company = company = findById(companyId,true);
-
-        if (company == null){
-            return null;
-        }
-        else{
-            company.setEmployees(employees);
-            return companyRepository.save(company);
-        }
+        Company company = companyRepository.findById(companyId).get();
+        company.getEmployees().forEach(e -> e.setCompany(null));
+        company.getEmployees().clear();
+        employees.forEach(e -> {
+            company.addEmployee(e);
+            employeeRepository.save(e);
+        });
+        return company;
     }
+
+    public List<Company> findByEmployeeSalary(int salary){
+        return companyRepository.findByEmployeeSalary(salary);
+    }
+    public List<Company> findByNumberOfEmp(int headcount){
+        return companyRepository.findByNumberOfEmp(headcount);
+    }
+
 
 }

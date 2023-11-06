@@ -1,5 +1,7 @@
 package hu.cubix.hr.zpalvolgyi.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -11,17 +13,29 @@ public class Employee {
     @GeneratedValue
     private Long id;
     private String name;
-    private String job;
+    @ManyToOne
+    @JsonManagedReference
+    private Position position;
     private int salary;
     private LocalDateTime hiringDate;
+    @ManyToOne
+    @JsonBackReference
+    private Company company;
 
     public Employee() {
     }
 
-    public Employee(Long id, String name, String job, int salary, LocalDateTime hiringDate) {
+    public Employee(Long id, String name, Position position, int salary, LocalDateTime hiringDate) {
         this.id = id;
         this.name = name;
-        this.job = job;
+        this.position = position;
+        this.salary = salary;
+        this.hiringDate = hiringDate;
+    }
+
+    public Employee(String name, Position position, int salary, LocalDateTime hiringDate) {
+        this.name = name;
+        this.position = position;
         this.salary = salary;
         this.hiringDate = hiringDate;
     }
@@ -42,12 +56,12 @@ public class Employee {
         this.name = name;
     }
 
-    public String getJob() {
-        return job;
+    public Position getPosition() {
+        return position;
     }
 
-    public void setJob(String job) {
-        this.job = job;
+    public void setPosition(Position position) {
+        this.position = position;
     }
 
     public int getSalary() {
@@ -64,5 +78,13 @@ public class Employee {
 
     public void setHiringDate(LocalDateTime hiringDate) {
         this.hiringDate = hiringDate;
+    }
+
+    public Company getCompany() {
+        return company;
+    }
+
+    public void setCompany(Company company) {
+        this.company = company;
     }
 }

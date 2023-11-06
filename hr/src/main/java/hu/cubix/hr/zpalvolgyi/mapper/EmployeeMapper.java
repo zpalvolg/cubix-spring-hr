@@ -3,6 +3,7 @@ package hu.cubix.hr.zpalvolgyi.mapper;
 import hu.cubix.hr.zpalvolgyi.dto.EmployeeDto;
 import hu.cubix.hr.zpalvolgyi.model.Employee;
 import org.mapstruct.Mapper;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 

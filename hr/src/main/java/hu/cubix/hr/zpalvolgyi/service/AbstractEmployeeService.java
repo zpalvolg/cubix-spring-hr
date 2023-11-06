@@ -1,14 +1,13 @@
 package hu.cubix.hr.zpalvolgyi.service;
 
-import hu.cubix.hr.zpalvolgyi.dto.EmployeeDto;
 import hu.cubix.hr.zpalvolgyi.model.Employee;
+import hu.cubix.hr.zpalvolgyi.model.Position;
 import hu.cubix.hr.zpalvolgyi.repository.EmployeeRepository;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -24,12 +23,10 @@ public abstract class AbstractEmployeeService implements EmployeeService{
         return employeeRepository.findById(id).orElse(null);
     }
 
-    @Transactional
     public Employee create(Employee employee){
         return employeeRepository.save(employee);
     }
 
-    @Transactional
     public Employee update(Employee updatedEmployee){
         if(findById(updatedEmployee.getId()) == null) {
             return null;
@@ -37,7 +34,6 @@ public abstract class AbstractEmployeeService implements EmployeeService{
         return employeeRepository.save(updatedEmployee);
     }
 
-    @Transactional
     public void delete(long id) {
         employeeRepository.deleteById(id);
     }
@@ -56,6 +52,14 @@ public abstract class AbstractEmployeeService implements EmployeeService{
 
     public List<Employee> findByhiringDate(LocalDateTime startDate, LocalDateTime endDate) {
         return employeeRepository.findByHiringDateBetween(startDate,endDate);
+    }
+
+    public List<Object[]> findAverageSalariesByJobAndCompany(long companyId){
+        return employeeRepository.findAverageSalariesByJobAndCompany(companyId);
+    }
+
+    public Page<Employee> findAllPageable(Pageable pageable){
+        return employeeRepository.findAll(pageable);
     }
 
 }

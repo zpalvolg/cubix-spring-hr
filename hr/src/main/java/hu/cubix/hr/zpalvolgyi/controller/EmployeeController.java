@@ -3,9 +3,11 @@ package hu.cubix.hr.zpalvolgyi.controller;
 import hu.cubix.hr.zpalvolgyi.dto.EmployeeDto;
 import hu.cubix.hr.zpalvolgyi.mapper.EmployeeMapper;
 import hu.cubix.hr.zpalvolgyi.model.Employee;
-import hu.cubix.hr.zpalvolgyi.service.AbstractEmployeeService;
+import hu.cubix.hr.zpalvolgyi.service.EmployeeService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -19,7 +21,7 @@ import java.util.List;
 public class EmployeeController {
 
     @Autowired
-    private AbstractEmployeeService employeeService;
+    private EmployeeService employeeService;
 
     @Autowired
     private EmployeeMapper employeeMapper;
@@ -93,5 +95,15 @@ public class EmployeeController {
     public List<EmployeeDto> findByhiringDate(@PathVariable LocalDateTime startDate, @PathVariable LocalDateTime endDate) {
         List<Employee> employees = employeeService.findByhiringDate(startDate,endDate);
         return employeeMapper.employeesToDtos(employees);
+    }
+
+    @GetMapping("/avgSalaryByCompany/{companyId}")
+    public List<Object[]>findAverageSalariesByJobAndCompany(@PathVariable long companyId) {
+        return employeeService.findAverageSalariesByJobAndCompany(companyId);
+    }
+
+    @GetMapping("/pageable")
+    public Page<Employee> findAllPageable(Pageable pageable) {
+        return employeeService.findAllPageable(pageable);
     }
 }

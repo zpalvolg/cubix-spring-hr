@@ -1,10 +1,9 @@
 package hu.cubix.hr.zpalvolgyi.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import hu.cubix.hr.zpalvolgyi.dto.EmployeeDto;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 
 import java.util.List;
 
@@ -16,17 +15,32 @@ public class Company {
     private Long registrationNumber;
     private String name;
     private String address;
-    @OneToMany
+    @OneToMany(mappedBy = "company", fetch = FetchType.EAGER)
+    @JsonManagedReference
     private List<Employee> employees;
+
+    @ManyToOne
+    @JsonManagedReference
+    private Form form;
 
     public Company() {
     }
-    public Company(Long id, Long registrationNumber, String name, String address, List<Employee> employees) {
+
+    public Company(Long id, Long registrationNumber, String name, String address, List<Employee> employees, Form form) {
         this.id = id;
         this.registrationNumber = registrationNumber;
         this.name = name;
         this.address = address;
         this.employees = employees;
+        this.form = form;
+    }
+
+    public Company(Long registrationNumber, String name, String address, List<Employee> employees, Form form) {
+        this.registrationNumber = registrationNumber;
+        this.name = name;
+        this.address = address;
+        this.employees = employees;
+        this.form = form;
     }
 
     public Long getId() {
@@ -67,5 +81,18 @@ public class Company {
 
     public void setEmployees(List<Employee> employees) {
         this.employees = employees;
+    }
+
+    public Form getForm() {
+        return form;
+    }
+
+    public void setForm(Form form) {
+        this.form = form;
+    }
+
+    public void addEmployee(Employee emp) {
+        emp.setCompany(this);
+        getEmployees().add(emp);
     }
 }
