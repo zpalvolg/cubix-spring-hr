@@ -2,6 +2,7 @@ package hu.cubix.hr.zpalvolgyi.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -14,12 +15,10 @@ public class Employee {
     private Long id;
     private String name;
     @ManyToOne
-    @JsonManagedReference
     private Position position;
     private int salary;
     private LocalDateTime hiringDate;
     @ManyToOne
-    @JsonBackReference
     private Company company;
 
     public Employee() {

@@ -1,5 +1,6 @@
 package hu.cubix.hr.zpalvolgyi.service;
 
+import hu.cubix.hr.zpalvolgyi.model.AverageSalaryByPosition;
 import hu.cubix.hr.zpalvolgyi.model.Employee;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,7 +29,9 @@ public interface EmployeeService {
 
     public List<Employee> findByhiringDate(LocalDateTime startDate, LocalDateTime endDate);
 
-    public List<Object[]> findAverageSalariesByJobAndCompany(long companyId);
+    public List<AverageSalaryByPosition> findAverageSalariesByJobAndCompany(long companyId);
 
     public Page<Employee> findAllPageable(Pageable pageable);
+
+    public List<Employee> findAllSpec(Employee employee);
 }

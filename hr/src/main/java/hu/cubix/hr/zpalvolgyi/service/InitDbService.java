@@ -1,6 +1,7 @@
 package hu.cubix.hr.zpalvolgyi.service;
 
 import hu.cubix.hr.zpalvolgyi.model.*;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
@@ -35,6 +36,7 @@ public class InitDbService {
         positionService.findAll().forEach(p -> positionService.delete(p.getId()));
     }
 
+    @Transactional
     public void insertTestData(){
 
         Position p1 = positionService.create(new Position("Accountant", EducationLevel.UNIVERSITY,500));

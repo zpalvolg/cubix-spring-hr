@@ -2,6 +2,7 @@ package hu.cubix.hr.zpalvolgyi.controller;
 
 import hu.cubix.hr.zpalvolgyi.dto.EmployeeDto;
 import hu.cubix.hr.zpalvolgyi.mapper.EmployeeMapper;
+import hu.cubix.hr.zpalvolgyi.model.AverageSalaryByPosition;
 import hu.cubix.hr.zpalvolgyi.model.Employee;
 import hu.cubix.hr.zpalvolgyi.service.EmployeeService;
 import jakarta.validation.Valid;
@@ -98,12 +99,30 @@ public class EmployeeController {
     }
 
     @GetMapping("/avgSalaryByCompany/{companyId}")
-    public List<Object[]>findAverageSalariesByJobAndCompany(@PathVariable long companyId) {
+    public List<AverageSalaryByPosition> findAverageSalariesByJobAndCompany(@PathVariable long companyId) {
         return employeeService.findAverageSalariesByJobAndCompany(companyId);
     }
 
     @GetMapping("/pageable")
-    public Page<Employee> findAllPageable(Pageable pageable) {
-        return employeeService.findAllPageable(pageable);
+    public List<EmployeeDto> findAllPageable(Pageable pageable) {
+        List<Employee> employees = null;
+
+        Page<Employee> page = employeeService.findAllPageable(pageable);
+
+        System.out.println(page.getTotalElements());
+        System.out.println(page.isFirst());
+        System.out.println(page.isLast());
+        System.out.println(page.getNumberOfElements());
+
+        employees = page.getContent();
+
+        return employeeMapper.employeesToDtos(employees);
+    }
+
+    @PostMapping("/spec")
+    public List<EmployeeDto> findAllSpec(@RequestBody EmployeeDto employeeDto) {
+        Employee employee = employeeMapper.dtoToEmployee(employeeDto);
+        List<Employee> employees = employeeService.findAllSpec(employee);
+        return employeeMapper.employeesToDtos(employees);
     }
 }

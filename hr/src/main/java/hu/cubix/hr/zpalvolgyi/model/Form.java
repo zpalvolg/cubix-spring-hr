@@ -18,7 +18,6 @@ public class Form {
     private String name;
 
     @OneToMany(mappedBy = "form")
-    @JsonBackReference
     private Set<Company> companies;
 
     public Form() {
@@ -38,5 +37,17 @@ public class Form {
 
     public Set<Company> getCompanies() {
         return companies;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setCompanies(Set<Company> companies) {
+        this.companies = companies;
     }
 }

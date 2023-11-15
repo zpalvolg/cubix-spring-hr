@@ -1,7 +1,6 @@
 package hu.cubix.hr.zpalvolgyi.dto;
 
 import hu.cubix.hr.zpalvolgyi.model.Company;
-import hu.cubix.hr.zpalvolgyi.model.Position;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.PositiveOrZero;
@@ -14,7 +13,7 @@ public class EmployeeDto {
     @NotEmpty
     private String name;
     @NotEmpty
-    private Position position;
+    private String job;
     @PositiveOrZero
     private int salary;
     @Past
@@ -23,10 +22,17 @@ public class EmployeeDto {
     public EmployeeDto() {
     }
 
-    public EmployeeDto(Long id, String name, Position position, int salary, LocalDateTime hiringDate) {
+    public EmployeeDto(Long id, String name, String job, int salary, LocalDateTime hiringDate) {
         this.id = id;
         this.name = name;
-        this.position = position;
+        this.job = job;
+        this.salary = salary;
+        this.hiringDate = hiringDate;
+    }
+
+    public EmployeeDto(String name, String job, int salary, LocalDateTime hiringDate) {
+        this.name = name;
+        this.job = job;
         this.salary = salary;
         this.hiringDate = hiringDate;
     }
@@ -47,12 +53,12 @@ public class EmployeeDto {
         this.name = name;
     }
 
-    public Position getPosition() {
-        return position;
+    public String getJob() {
+        return job;
     }
 
-    public void setPosition(Position position) {
-        this.position = position;
+    public void setJob(String job) {
+        this.job = job;
     }
 
     public int getSalary() {

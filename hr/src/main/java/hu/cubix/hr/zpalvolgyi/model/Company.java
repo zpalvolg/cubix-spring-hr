@@ -15,12 +15,10 @@ public class Company {
     private Long registrationNumber;
     private String name;
     private String address;
-    @OneToMany(mappedBy = "company", fetch = FetchType.EAGER)
-    @JsonManagedReference
+    @OneToMany(mappedBy = "company")
     private List<Employee> employees;
 
     @ManyToOne
-    @JsonManagedReference
     private Form form;
 
     public Company() {

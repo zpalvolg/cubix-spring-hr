@@ -1,9 +1,5 @@
 package hu.cubix.hr.zpalvolgyi.dto;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import hu.cubix.hr.zpalvolgyi.model.Employee;
-import hu.cubix.hr.zpalvolgyi.model.Form;
-
 import java.util.List;
 
 public class CompanyDto {
@@ -11,20 +7,26 @@ public class CompanyDto {
     private Long registrationNumber;
     private String name;
     private String address;
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private List<Employee> employees;
-    private Form form;
-
+    private String form;
+    private List<EmployeeDto> employees;
     public CompanyDto() {
     }
 
-    public CompanyDto(Long id, Long registrationNumber, String name, String address, List<Employee> employees, Form form) {
+    public CompanyDto(Long id, Long registrationNumber, String name, String address, String form, List<EmployeeDto> employees) {
         this.id = id;
         this.registrationNumber = registrationNumber;
         this.name = name;
         this.address = address;
-        this.employees = employees;
         this.form = form;
+        this.employees = employees;
+    }
+
+    public CompanyDto(Long registrationNumber, String name, String address, String form, List<EmployeeDto> employees) {
+        this.registrationNumber = registrationNumber;
+        this.name = name;
+        this.address = address;
+        this.form = form;
+        this.employees = employees;
     }
 
     public Long getId() {
@@ -59,19 +61,19 @@ public class CompanyDto {
         this.address = address;
     }
 
-    public List<Employee> getEmployees() {
-        return employees;
-    }
-
-    public void setEmployees(List<Employee> employees) {
-        this.employees = employees;
-    }
-
-    public Form getForm() {
+    public String getForm() {
         return form;
     }
 
-    public void setForm(Form form) {
+    public void setForm(String form) {
         this.form = form;
+    }
+
+    public List<EmployeeDto> getEmployees() {
+        return employees;
+    }
+
+    public void setEmployees(List<EmployeeDto> employees) {
+        this.employees = employees;
     }
 }

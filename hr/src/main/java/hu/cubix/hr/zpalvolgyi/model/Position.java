@@ -19,8 +19,8 @@ public class Position {
     private EducationLevel qualification;
     private int min_salary;
     @OneToMany(mappedBy = "position")
-    @JsonBackReference
     private Set<Employee> employees;
+
     public Position() {
     }
 
@@ -28,6 +28,10 @@ public class Position {
         this.name = name;
         this.qualification = qualification;
         this.min_salary = min_salary;
+    }
+
+    public Position(String name){
+        this.name = name;
     }
 
     public Long getId() {
