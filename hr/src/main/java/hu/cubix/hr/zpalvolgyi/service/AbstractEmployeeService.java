@@ -91,7 +91,7 @@ public abstract class AbstractEmployeeService implements EmployeeService{
     }
 
     public List<Employee> findAllSpec(Employee employee){
-        long id = employee.getId();
+        long id = employee.getId() == null ? 0 : employee.getId();
         String employeeName = employee.getName();
         String positionName = "";
         int salary = employee.getSalary();

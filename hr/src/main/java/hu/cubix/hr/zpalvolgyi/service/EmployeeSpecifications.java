@@ -4,6 +4,7 @@ import hu.cubix.hr.zpalvolgyi.model.Employee;
 import hu.cubix.hr.zpalvolgyi.model.Employee_;
 import org.springframework.data.jpa.domain.Specification;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class EmployeeSpecifications {
@@ -23,8 +24,11 @@ public class EmployeeSpecifications {
         return (root, cq, cb) -> cb.equal(root.get(Employee_.salary), salary);
     }
 
-    public static Specification<Employee> hasHiringDate(LocalDateTime hiringDate){
-        return (root, cq, cb) -> cb.equal(root.get(Employee_.hiringDate), hiringDate);
+    public static Specification<Employee> hasHiringDate(LocalDateTime hiringDate) {
+        return (root, cq, cb) -> cb.equal(
+                cb.function("DATE_TRUNC", LocalDateTime.class, cb.literal("DAY"), root.get(Employee_.hiringDate)),
+                hiringDate.truncatedTo(java.time.temporal.ChronoUnit.DAYS)
+        );
     }
 
     public static Specification<Employee> companyNameStartsWith(String prefix){

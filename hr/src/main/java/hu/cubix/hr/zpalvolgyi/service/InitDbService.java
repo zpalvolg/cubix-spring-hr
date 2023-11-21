@@ -22,7 +22,14 @@ public class InitDbService {
     @Autowired
     private PositionService positionService;
 
+    @Autowired
+    private TimeOffRequestService timeOffRequestService;
+
     public void clearDb(){
+
+        //delete TimeOffRequests
+        timeOffRequestService.findAll().forEach(t -> timeOffRequestService.delete(t.getId()));
+
         //delete Employees
         employeeService.findAll().forEach(e -> employeeService.delete(e.getId()));
 
@@ -50,7 +57,7 @@ public class InitDbService {
         Employee e4 = new Employee("Jennifer",p1, 400, LocalDateTime.of(2022, 9, 3, 0, 0, 0));
         Employee e5 = new Employee("Michael",p2, 1500, LocalDateTime.of(2016, 5, 3, 0, 0, 0));
         Employee e6 = new Employee("Jack",p3, 800, LocalDateTime.of(2015, 5, 3, 0, 0, 0));
-        Employee e7 = new Employee("Joe",p1, 600, LocalDateTime.of(2021, 6, 3, 0, 0, 0));
+        Employee e7 = new Employee("Joe",p1, 600, LocalDateTime.of(2021, 6, 3, 1, 0, 0));
 
         Form f1 = formService.create(new Form("Limited Partnership"));
         Form f2 = formService.create(new Form("LLC"));
@@ -69,5 +76,38 @@ public class InitDbService {
         companyService.addNewEmployee(c3.getId(), e5);
         companyService.addNewEmployee(c3.getId(), e6);
         companyService.addNewEmployee(c3.getId(), e7);
+
+        TimeOffRequest timeOffR1 = timeOffRequestService.create(
+                new TimeOffRequest(
+                LocalDateTime.of(2023, 11, 27, 0, 0, 0) //starDate
+                ,LocalDateTime.of(2023, 11, 30, 0, 0, 0) //endDate
+                ,e1 //requestedBy
+                ,LocalDateTime.now() //requestDate
+                ,e2 //approver
+                ,RequestStatus.WAITING_FOR_APPROVAL //requestStatus
+            )
+        );
+
+        TimeOffRequest timeOffR2 = timeOffRequestService.create(
+                new TimeOffRequest(
+                        LocalDateTime.of(2023, 12, 27, 0, 0, 0) //starDate
+                        ,LocalDateTime.of(2023, 12, 30, 0, 0, 0) //endDate
+                        ,e3 //requestedBy
+                        ,LocalDateTime.now() //requestDate
+                        ,e4 //approver
+                        ,RequestStatus.APPROVED //requestStatus
+                )
+        );
+
+        TimeOffRequest timeOffR3 = timeOffRequestService.create(
+                new TimeOffRequest(
+                        LocalDateTime.of(2024, 1, 27, 0, 0, 0) //starDate
+                        ,LocalDateTime.of(2024, 1, 30, 0, 0, 0) //endDate
+                        ,e5 //requestedBy
+                        ,LocalDateTime.now() //requestDate
+                        ,e6 //approver
+                        ,RequestStatus.REJECTED //requestStatus
+                )
+        );
     }
 }

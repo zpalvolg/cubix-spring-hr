@@ -2,7 +2,6 @@ package hu.cubix.hr.zpalvolgyi.repository;
 
 import hu.cubix.hr.zpalvolgyi.model.AverageSalaryByPosition;
 import hu.cubix.hr.zpalvolgyi.model.Employee;
-import hu.cubix.hr.zpalvolgyi.model.Position;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -22,6 +21,8 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> , JpaS
     List<Employee> findByNameStartingWithIgnoreCase(String name);
 
     List<Employee> findByHiringDateBetween(LocalDateTime startDate, LocalDateTime endDate);
+
+    public List<Employee> findByName(String name);
 
     @Query("SELECT e.position.name as position, avg(e.salary) as averageSalary "
             + "FROM Company c "

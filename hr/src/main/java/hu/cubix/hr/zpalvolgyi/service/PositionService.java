@@ -21,7 +21,6 @@ public class PositionService {
     public void delete(Long id){
         positionRepository.deleteById(id);
     }
-
     public List<Position> findAll(){
         return positionRepository.findAll();
     }

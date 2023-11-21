@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 public class Employee {
@@ -20,6 +21,10 @@ public class Employee {
     private LocalDateTime hiringDate;
     @ManyToOne
     private Company company;
+    @OneToMany(mappedBy = "requestedBy")
+    private List<TimeOffRequest> requestedTimeOffRequests;
+    @OneToMany(mappedBy = "approver")
+    private List<TimeOffRequest> approvedTimeOffRequests;
 
     public Employee() {
     }
@@ -37,6 +42,11 @@ public class Employee {
         this.position = position;
         this.salary = salary;
         this.hiringDate = hiringDate;
+    }
+
+    public Employee(String name) {
+        this.name = name;
+        this.hiringDate = LocalDateTime.now();
     }
 
     public Long getId() {
@@ -85,5 +95,21 @@ public class Employee {
 
     public void setCompany(Company company) {
         this.company = company;
+    }
+
+    public List<TimeOffRequest> getRequestedTimeOffRequests() {
+        return requestedTimeOffRequests;
+    }
+
+    public void setRequestedTimeOffRequests(List<TimeOffRequest> requestedTimeOffRequests) {
+        this.requestedTimeOffRequests = requestedTimeOffRequests;
+    }
+
+    public List<TimeOffRequest> getApprovedTimeOffRequests() {
+        return approvedTimeOffRequests;
+    }
+
+    public void setApprovedTimeOffRequests(List<TimeOffRequest> approvedTimeOffRequests) {
+        this.approvedTimeOffRequests = approvedTimeOffRequests;
     }
 }

@@ -8,15 +8,10 @@ import jakarta.validation.constraints.PositiveOrZero;
 import java.time.LocalDateTime;
 
 public class EmployeeDto {
-    @PositiveOrZero
     private Long id;
-    @NotEmpty
     private String name;
-    @NotEmpty
     private String job;
-    @PositiveOrZero
     private int salary;
-    @Past
     private LocalDateTime hiringDate;
 
     public EmployeeDto() {
