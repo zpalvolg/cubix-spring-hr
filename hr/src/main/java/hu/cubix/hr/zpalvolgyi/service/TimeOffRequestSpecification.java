@@ -2,7 +2,6 @@ package hu.cubix.hr.zpalvolgyi.service;
 
 import hu.cubix.hr.zpalvolgyi.model.*;
 import org.springframework.data.jpa.domain.Specification;
-
 import java.time.LocalDateTime;
 
 public class TimeOffRequestSpecification {
@@ -19,15 +18,16 @@ public class TimeOffRequestSpecification {
         return (root, cq, cb) -> cb.like(cb.lower(root.get(TimeOffRequest_.approver).get(Employee_.name)), prefix.toLowerCase() + "%");
     }
 
-    public static Specification<TimeOffRequest> requestDateInRange(LocalDateTime startDate, LocalDateTime endDate) {
-        return (root, cq, cb) -> cb.between(root.get(TimeOffRequest_.requestDate), startDate, endDate);
+    public static Specification<TimeOffRequest> createDateIsBetween(LocalDateTime createDateTimeStart,
+                                                                    LocalDateTime createDateTimeEnd) {
+        return (root, cq, cb) -> cb.between(root.get(TimeOffRequest_.requestDate), createDateTimeStart, createDateTimeEnd);
     }
 
-    public static Specification<TimeOffRequest> startDateInRange(LocalDateTime startDate, LocalDateTime endDate) {
-        return (root, cq, cb) -> cb.between(root.get(TimeOffRequest_.startDate), startDate, endDate);
+    public static Specification<TimeOffRequest> isStartDateLessThan(LocalDateTime date) {
+        return (root, cq, cb) -> cb.lessThan(root.get(TimeOffRequest_.startDate), date);
     }
 
-    public static Specification<TimeOffRequest> endDateInRange(LocalDateTime startDate, LocalDateTime endDate) {
-        return (root, cq, cb) -> cb.between(root.get(TimeOffRequest_.endDate), startDate, endDate);
+    public static Specification<TimeOffRequest> isEndDateGreaterThan(LocalDateTime date) {
+        return (root, cq, cb) -> cb.greaterThan(root.get(TimeOffRequest_.endDate), date);
     }
 }

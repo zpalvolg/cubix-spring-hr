@@ -6,6 +6,7 @@ import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 public class EmployeeSpecifications {
     public static Specification<Employee> hasId(long id){
@@ -21,14 +22,12 @@ public class EmployeeSpecifications {
     }
 
     public static Specification<Employee> hasSalary(int salary){
-        return (root, cq, cb) -> cb.equal(root.get(Employee_.salary), salary);
+        return (root, cq, cb) -> cb.between(root.get(Employee_.salary), (int)(salary * 0.95) , (int)(salary* 1.05));
     }
 
-    public static Specification<Employee> hasHiringDate(LocalDateTime hiringDate) {
-        return (root, cq, cb) -> cb.equal(
-                cb.function("DATE_TRUNC", LocalDateTime.class, cb.literal("DAY"), root.get(Employee_.hiringDate)),
-                hiringDate.truncatedTo(java.time.temporal.ChronoUnit.DAYS)
-        );
+    public static Specification<Employee> hasHiringDate(LocalDateTime entryDate) {
+        LocalDateTime startOfDay = LocalDateTime.of(entryDate.toLocalDate(), LocalTime.of(0, 0));
+        return (root, cq, cb) -> cb.between(root.get(Employee_.hiringDate), startOfDay, startOfDay.plusDays(1));
     }
 
     public static Specification<Employee> companyNameStartsWith(String prefix){

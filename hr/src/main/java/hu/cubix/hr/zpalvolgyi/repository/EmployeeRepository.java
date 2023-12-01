@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface EmployeeRepository extends JpaRepository<Employee, Long> , JpaSpecificationExecutor<Employee> {
     List<Employee> findBySalaryIsGreaterThanEqual(int limit);
@@ -31,5 +32,7 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> , JpaS
             + "GROUP BY e.position.name "
             + "ORDER BY avg(e.salary) desc")
     List<AverageSalaryByPosition> findAverageSalariesByJobAndCompany(long companyId);
+
+    Optional<Employee> findByUsername(String username);
 }
 

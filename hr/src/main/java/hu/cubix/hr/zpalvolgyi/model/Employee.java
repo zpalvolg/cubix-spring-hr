@@ -26,6 +26,12 @@ public class Employee {
     @OneToMany(mappedBy = "approver")
     private List<TimeOffRequest> approvedTimeOffRequests;
 
+    @ManyToOne
+    private Employee manager;
+
+    private String username;
+    private String password;
+
     public Employee() {
     }
 
@@ -111,5 +117,29 @@ public class Employee {
 
     public void setApprovedTimeOffRequests(List<TimeOffRequest> approvedTimeOffRequests) {
         this.approvedTimeOffRequests = approvedTimeOffRequests;
+    }
+
+    public Employee getManager() {
+        return manager;
+    }
+
+    public void setManager(Employee manager) {
+        this.manager = manager;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

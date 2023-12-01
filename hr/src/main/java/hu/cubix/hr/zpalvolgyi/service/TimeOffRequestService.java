@@ -1,18 +1,23 @@
 package hu.cubix.hr.zpalvolgyi.service;
 
+import hu.cubix.hr.zpalvolgyi.dto.TimeOffRequestFilterDto;
 import hu.cubix.hr.zpalvolgyi.model.Employee;
 import hu.cubix.hr.zpalvolgyi.model.RequestStatus;
 import hu.cubix.hr.zpalvolgyi.model.TimeOffRequest;
 import hu.cubix.hr.zpalvolgyi.repository.EmployeeRepository;
 import hu.cubix.hr.zpalvolgyi.repository.TimeOffRequestRepository;
+import hu.cubix.hr.zpalvolgyi.security.HrUser;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import static hu.cubix.hr.zpalvolgyi.service.TimeOffRequestSpecification.*;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -40,6 +45,12 @@ public class TimeOffRequestService {
     public TimeOffRequest update(TimeOffRequest updatedTimeOffRequest){
         TimeOffRequest timeOffRequest = findById(updatedTimeOffRequest.getId());
 
+        String currentUser = getCurrentEmployee().getName();
+
+        //only manager can change request status
+         if((!currentUser.equals(timeOffRequest.getApprover().getName()))  && (!updatedTimeOffRequest.getRequestStatus().equals(timeOffRequest.getRequestStatus())))
+            return null;
+
         if(validateRequestStatus(timeOffRequest) == null || timeOffRequest == null) {
             return null;
         }
@@ -50,8 +61,17 @@ public class TimeOffRequestService {
         return timeOffRequestRepository.save(updatedTimeOffRequest);
     }
 
+    private Employee getCurrentEmployee() {
+        return ((HrUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getEmployee();
+    }
+
     public TimeOffRequest deleteWithValidation(long id){
         TimeOffRequest timeOffRequest = findById(id);
+
+        //only requester can delete request
+        if(!getCurrentEmployee().getName().equals(timeOffRequest.getRequestedBy().getName()))
+            return null;
+
         if(validateRequestStatus(timeOffRequest) == null || timeOffRequest == null) {
             return null;
         }else {
@@ -100,16 +120,15 @@ public class TimeOffRequestService {
         return timeOffRequestRepository.findAll(pageable);
     }
 
-    public List<TimeOffRequest> findAll(TimeOffRequest timeOffRequest
-                                        , LocalDateTime requestDateStart
-                                        , LocalDateTime requestDateEnd
-                                        , LocalDateTime timeOffDateStart
-                                        , LocalDateTime timeOffDateEnd
-    ) {
+    public List<TimeOffRequest> findAll(TimeOffRequestFilterDto timeOffRequestFilterDto) {
 
-        RequestStatus requestStatus = timeOffRequest.getRequestStatus();
-        String requesterName = timeOffRequest.getRequestedBy().getName();
-        String approverName = timeOffRequest.getApprover().getName();
+        RequestStatus requestStatus = timeOffRequestFilterDto.getRequestStatus();
+        String requesterName = timeOffRequestFilterDto.getRequestedBy();
+        String approverName = timeOffRequestFilterDto.getApprover();
+        LocalDateTime createDateTimeStart = timeOffRequestFilterDto.getCreateDateTimeStart();
+        LocalDateTime createDateTimeEnd = timeOffRequestFilterDto.getCreateDateTimeEnd();
+        LocalDateTime startOfHolidayRequest = timeOffRequestFilterDto.getStartDate();
+        LocalDateTime endOfHolidayRequest = timeOffRequestFilterDto.getEndDate();
 
         Specification<TimeOffRequest> spec = Specification.where(null);
 
@@ -125,13 +144,15 @@ public class TimeOffRequestService {
             spec = spec.and(approverNameStartsWith(approverName));
         }
 
-        if(requestDateStart != null && requestDateEnd != null){
-            spec = spec.and(requestDateInRange(requestDateStart, requestDateEnd));
+        if (createDateTimeStart != null && createDateTimeEnd != null)
+            spec = spec.and(createDateIsBetween(createDateTimeStart, createDateTimeEnd));
+
+        if (startOfHolidayRequest != null) {
+            spec = spec.and(isEndDateGreaterThan(startOfHolidayRequest));
         }
 
-        if(timeOffDateStart != null && timeOffDateEnd != null){
-            spec = spec.and(startDateInRange(timeOffDateStart, timeOffDateEnd));
-            spec = spec.and(endDateInRange(timeOffDateStart, timeOffDateEnd));
+        if (endOfHolidayRequest != null) {
+            spec = spec.and(isStartDateLessThan(endOfHolidayRequest));
         }
 
         return timeOffRequestRepository.findAll(spec);

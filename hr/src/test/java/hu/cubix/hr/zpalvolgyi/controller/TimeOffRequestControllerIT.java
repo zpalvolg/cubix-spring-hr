@@ -1,13 +1,19 @@
 package hu.cubix.hr.zpalvolgyi.controller;
 
 import hu.cubix.hr.zpalvolgyi.dto.TimeOffRequestDto;
-import hu.cubix.hr.zpalvolgyi.model.RequestStatus;
+import hu.cubix.hr.zpalvolgyi.model.*;
+import hu.cubix.hr.zpalvolgyi.service.*;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.reactive.server.WebTestClient;
+
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -19,27 +25,67 @@ public class TimeOffRequestControllerIT {
     @Autowired
     WebTestClient webTestClient;
 
+    @Autowired
+    private CompanyService companyService;
+
+    @Autowired
+    private FormService formService;
+
+    @Autowired
+    private PositionService positionService;
+
+    @Autowired
+    PasswordEncoder passwordEncoder;
+
     @Test
+    @Transactional
     public void testProcessFlow() {
+
+        //ARRANGE
+        String password = "pass";
+
+        Position p1 = positionService.create(new Position("Accountant", EducationLevel.UNIVERSITY,500));
+        Position p2 = positionService.create(new Position("Global Manager", EducationLevel.PHD,700));
+
+        Employee e1 = new Employee("John", p1, 700, LocalDateTime.of(2020, 4, 10, 0, 0, 0));
+        e1.setUsername("user1");
+        e1.setPassword(passwordEncoder.encode(password));
+
+        Employee e2 = new Employee("Mary",p2, 950, LocalDateTime.of(2017, 5, 11, 0, 0, 0));
+        e2.setUsername("user2");
+        e2.setPassword(passwordEncoder.encode(password));
+
+        Form f1 = formService.create(new Form("Limited Partnership"));
+
+        Company c1 = companyService.create(new Company(123L, "Test-1 Ldt.", "Debrecen, Piac Street 123", new ArrayList<>(),f1));
+
+        companyService.addNewEmployee(c1.getId(), e1);
+        companyService.addNewEmployee(c1.getId(), e2);
+
+        //ACT
         // create new time off request
-        TimeOffRequestDto timeOffRequestDto = createTimeOffRequest();
+        TimeOffRequestDto timeOffRequestDto = createTimeOffRequest(e1,e2,password);
+        //ASSERT
         assertThat(timeOffRequestDto.getId()).isGreaterThan(0);
 
+        //ACT
         //update endDate and set to status to Approved
-        TimeOffRequestDto updatedTimeOffRequestDto = updateTimeOffRequest(timeOffRequestDto);
+        TimeOffRequestDto updatedTimeOffRequestDto = updateTimeOffRequest(timeOffRequestDto,e2,password);
+        //ASSERT
         assertThat(updatedTimeOffRequestDto.getRequestStatus()).isEqualTo(RequestStatus.APPROVED);
 
+        //ACT
         //try to delete it but it won't work because it is already approved
-        deleteTimeOffRequest(updatedTimeOffRequestDto);
+        deleteTimeOffRequest(updatedTimeOffRequestDto,e1,password);
     }
 
-    private TimeOffRequestDto createTimeOffRequest(){
+    private TimeOffRequestDto createTimeOffRequest(Employee requester, Employee approver, String password){
         TimeOffRequestDto timeOffRequestDto = new TimeOffRequestDto(
                     LocalDateTime.of(2023, 11, 27, 0, 0, 0)
                     , LocalDateTime.of(2023, 11, 30, 0, 0, 0)
-                    ,"Requester"
+                    ,requester.getName()
                     ,LocalDateTime.now()
-                    ,"Approver"
+                    ,approver.getName()
                     ,RequestStatus.WAITING_FOR_APPROVAL
         );
 
@@ -47,6 +93,7 @@ public class TimeOffRequestControllerIT {
                 .post()
                 .uri(API_TIMEOFFR)
                 .bodyValue(timeOffRequestDto)
+                .headers(headers -> headers.setBasicAuth(requester.getUsername(), password))
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(TimeOffRequestDto.class)
@@ -54,14 +101,14 @@ public class TimeOffRequestControllerIT {
                 .getResponseBody();
     }
 
-    private TimeOffRequestDto updateTimeOffRequest(TimeOffRequestDto timeOffRequestDto){
+    private TimeOffRequestDto updateTimeOffRequest(TimeOffRequestDto timeOffRequestDto, Employee approver, String password){
 
         TimeOffRequestDto updatedTimeOffRequestDto = new TimeOffRequestDto(
                 LocalDateTime.of(2023, 11, 27, 0, 0, 0)
                 , LocalDateTime.of(2023, 12, 30, 0, 0, 0)
-                ,"Requester"
+                ,timeOffRequestDto.getRequestedBy()
                 ,LocalDateTime.now()
-                ,"Approver"
+                ,timeOffRequestDto.getApprover()
                 ,RequestStatus.APPROVED
         );
 
@@ -70,6 +117,7 @@ public class TimeOffRequestControllerIT {
                 .put()
                 .uri(API_TIMEOFFR + "/" + timeOffRequestDto.getId())
                 .bodyValue(updatedTimeOffRequestDto)
+                .headers(headers -> headers.setBasicAuth(approver.getUsername(), password))
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(TimeOffRequestDto.class)
@@ -77,10 +125,11 @@ public class TimeOffRequestControllerIT {
                 .getResponseBody();
     }
 
-    private void deleteTimeOffRequest(TimeOffRequestDto timeOffRequestDto){
+    private void deleteTimeOffRequest(TimeOffRequestDto timeOffRequestDto, Employee requester, String password){
         webTestClient
                 .delete()
                 .uri(API_TIMEOFFR + "/" + timeOffRequestDto.getId())
+                .headers(headers -> headers.setBasicAuth(requester.getUsername(), password))
                 .exchange()
                 .expectStatus().isBadRequest();
     }

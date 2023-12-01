@@ -1,6 +1,7 @@
 package hu.cubix.hr.zpalvolgyi.controller;
 
 import hu.cubix.hr.zpalvolgyi.dto.TimeOffRequestDto;
+import hu.cubix.hr.zpalvolgyi.dto.TimeOffRequestFilterDto;
 import hu.cubix.hr.zpalvolgyi.mapper.TimeOffRequestMapper;
 import hu.cubix.hr.zpalvolgyi.model.TimeOffRequest;
 import hu.cubix.hr.zpalvolgyi.service.TimeOffRequestService;
@@ -8,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -25,6 +27,7 @@ public class TimeOffRequestController {
     TimeOffRequestMapper timeOffRequestMapper;
 
     @PostMapping
+    @PreAuthorize("#timeOffRequestDto.requestedBy == authentication.principal.employee.name")
     public TimeOffRequestDto create(@RequestBody TimeOffRequestDto timeOffRequestDto){
         TimeOffRequest timeOffRequest = timeOffRequestMapper.dtoTotimeOffRequest(timeOffRequestDto);
         TimeOffRequest savedTimeOffReqest = timeOffRequestService.create(timeOffRequest);
@@ -73,14 +76,8 @@ public class TimeOffRequestController {
     }
 
     @PostMapping("/spec")
-    public List<TimeOffRequestDto> findAllSpec(@RequestBody TimeOffRequestDto timeOffRequestDto
-                                            , @RequestParam(required = false) LocalDateTime requestDateStart
-                                            , @RequestParam(required = false) LocalDateTime requestDateEnd
-                                            , @RequestParam(required = false) LocalDateTime timeOffDateStart
-                                            , @RequestParam(required = false) LocalDateTime timeOffDateEnd
-    ) {
-        TimeOffRequest timeOffRequest = timeOffRequestMapper.dtoTotimeOffRequest(timeOffRequestDto);
-        List<TimeOffRequest> timeOffRequests = timeOffRequestService.findAll(timeOffRequest,requestDateStart,requestDateEnd,timeOffDateStart,timeOffDateEnd);
+    public List<TimeOffRequestDto> findAllSpec(@RequestBody TimeOffRequestFilterDto timeOffRequestFilterDto) {
+        List<TimeOffRequest> timeOffRequests = timeOffRequestService.findAll(timeOffRequestFilterDto);
         return timeOffRequestMapper.timeOffRequestsToDtos(timeOffRequests);
     }
 
