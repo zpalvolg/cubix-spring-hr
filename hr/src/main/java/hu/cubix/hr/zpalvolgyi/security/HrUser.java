@@ -19,4 +19,7 @@ public class HrUser extends User {
         return employee;
     }
 
+    public void setEmployee(Employee employee) {
+        this.employee = employee;
+    }
 }

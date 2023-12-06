@@ -1,5 +1,6 @@
 package hu.cubix.hr.zpalvolgyi.controller;
 
+import hu.cubix.hr.zpalvolgyi.dto.LoginDto;
 import hu.cubix.hr.zpalvolgyi.dto.TimeOffRequestDto;
 import hu.cubix.hr.zpalvolgyi.model.*;
 import hu.cubix.hr.zpalvolgyi.service.*;
@@ -21,6 +22,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class TimeOffRequestControllerIT {
 
     private static final String API_TIMEOFFR = "/api/timeoffrequests";
+
+    private static final String API_LOGIN = "/api/login";
 
     @Autowired
     WebTestClient webTestClient;
@@ -77,6 +80,21 @@ public class TimeOffRequestControllerIT {
         //ACT
         //try to delete it but it won't work because it is already approved
         deleteTimeOffRequest(updatedTimeOffRequestDto,e1,password);
+
+    }
+
+    private String getJwtToken(String username, String password){
+        LoginDto loginDto = new LoginDto(username,password);
+
+        return webTestClient
+                .post()
+                .uri(API_LOGIN)
+                .bodyValue(loginDto)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(String.class)
+                .returnResult()
+                .getResponseBody();
     }
 
     private TimeOffRequestDto createTimeOffRequest(Employee requester, Employee approver, String password){
@@ -89,11 +107,13 @@ public class TimeOffRequestControllerIT {
                     ,RequestStatus.WAITING_FOR_APPROVAL
         );
 
+        String bearerToken = getJwtToken(requester.getUsername(), password);
+
         return webTestClient
                 .post()
                 .uri(API_TIMEOFFR)
                 .bodyValue(timeOffRequestDto)
-                .headers(headers -> headers.setBasicAuth(requester.getUsername(), password))
+                .header("Authorization", "Bearer " + bearerToken)
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(TimeOffRequestDto.class)
@@ -112,12 +132,13 @@ public class TimeOffRequestControllerIT {
                 ,RequestStatus.APPROVED
         );
 
+        String bearerToken = getJwtToken(approver.getUsername(), password);
 
         return webTestClient
                 .put()
                 .uri(API_TIMEOFFR + "/" + timeOffRequestDto.getId())
                 .bodyValue(updatedTimeOffRequestDto)
-                .headers(headers -> headers.setBasicAuth(approver.getUsername(), password))
+                .header("Authorization", "Bearer " + bearerToken)
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(TimeOffRequestDto.class)
@@ -126,11 +147,14 @@ public class TimeOffRequestControllerIT {
     }
 
     private void deleteTimeOffRequest(TimeOffRequestDto timeOffRequestDto, Employee requester, String password){
+
+        String bearerToken = getJwtToken(requester.getUsername(), password);
+
         webTestClient
                 .delete()
                 .uri(API_TIMEOFFR + "/" + timeOffRequestDto.getId())
-                .headers(headers -> headers.setBasicAuth(requester.getUsername(), password))
+                .header("Authorization", "Bearer " + bearerToken)
                 .exchange()
-                .expectStatus().isBadRequest();
+                .expectStatus().isForbidden();
     }
 }

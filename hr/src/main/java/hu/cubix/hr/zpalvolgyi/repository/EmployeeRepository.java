@@ -2,6 +2,7 @@ package hu.cubix.hr.zpalvolgyi.repository;
 
 import hu.cubix.hr.zpalvolgyi.model.AverageSalaryByPosition;
 import hu.cubix.hr.zpalvolgyi.model.Employee;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -33,6 +34,7 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> , JpaS
             + "ORDER BY avg(e.salary) desc")
     List<AverageSalaryByPosition> findAverageSalariesByJobAndCompany(long companyId);
 
+    @EntityGraph(attributePaths = {"manager", "managedEmployees"})
     Optional<Employee> findByUsername(String username);
 }
 

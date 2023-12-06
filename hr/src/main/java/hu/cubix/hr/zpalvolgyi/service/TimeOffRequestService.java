@@ -16,8 +16,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import static hu.cubix.hr.zpalvolgyi.service.TimeOffRequestSpecification.*;
-
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -48,7 +46,7 @@ public class TimeOffRequestService {
         String currentUser = getCurrentEmployee().getName();
 
         //only manager can change request status
-         if((!currentUser.equals(timeOffRequest.getApprover().getName()))  && (!updatedTimeOffRequest.getRequestStatus().equals(timeOffRequest.getRequestStatus())))
+        if((!currentUser.equals(timeOffRequest.getApprover().getName()))  && (!updatedTimeOffRequest.getRequestStatus().equals(timeOffRequest.getRequestStatus())))
             return null;
 
         if(validateRequestStatus(timeOffRequest) == null || timeOffRequest == null) {
